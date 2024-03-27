@@ -1,20 +1,63 @@
-﻿// 8_ферзей.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
-//
+﻿#include <iostream>
+#include <vector>
 
-#include <iostream>
+using namespace std;
 
-int main()
-{
-    std::cout << "Hello World!\n";
+bool isSafe(vector<vector<int>>& board, int row, int col, int N) {
+    int i, j;
+
+    // Проверяем, есть ли ферзь в этом же столбце выше по вертикали
+    for (i = 0; i < row; i++)
+        if (board[i][col])
+            return false;
+
+    // Проверяем, есть ли ферзь в верхнем левом диагональном направлении
+    for (i = row, j = col; i >= 0 && j >= 0; i--, j--)
+        if (board[i][j])
+            return false;
+
+    // Проверяем, есть ли ферзь в верхнем правом диагональном направлении
+    for (i = row, j = col; i >= 0 && j < N; i--, j++)
+        if (board[i][j])
+            return false;
+
+    return true;
 }
 
-// Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
-// Отладка программы: F5 или меню "Отладка" > "Запустить отладку"
+bool solveNQueens(vector<vector<int>>& board, int row, int N) {
+    if (row >= N)
+        return true;
 
-// Советы по началу работы 
-//   1. В окне обозревателя решений можно добавлять файлы и управлять ими.
-//   2. В окне Team Explorer можно подключиться к системе управления версиями.
-//   3. В окне "Выходные данные" можно просматривать выходные данные сборки и другие сообщения.
-//   4. В окне "Список ошибок" можно просматривать ошибки.
-//   5. Последовательно выберите пункты меню "Проект" > "Добавить новый элемент", чтобы создать файлы кода, или "Проект" > "Добавить существующий элемент", чтобы добавить в проект существующие файлы кода.
-//   6. Чтобы снова открыть этот проект позже, выберите пункты меню "Файл" > "Открыть" > "Проект" и выберите SLN-файл.
+    for (int col = 0; col < N; col++) {
+        if (isSafe(board, row, col, N)) {
+            board[row][col] = 1;
+            if (solveNQueens(board, row + 1, N))
+                return true;
+            board[row][col] = 0; // Возврат к предыдущему шагу
+        }
+    }
+
+    return false;
+}
+
+int main() {
+    int N;
+    cout << "Введите размер доски N x N: ";
+    cin >> N;
+
+    vector<vector<int>> board(N, vector<int>(N, 0));
+
+    if (solveNQueens(board, 0, N)) {
+        cout << "Решение найдено:" << endl;
+        for (int i = 0; i < N; i++) {
+            for (int j = 0; j < N; j++)
+                cout << board[i][j] << " ";
+            cout << endl;
+        }
+    }
+    else {
+        cout << "Решение не найдено" << endl;
+    }
+
+    return 0;
+}
